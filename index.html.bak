@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>TikTok Downloader Super Lengkap</title>
+  <link rel="icon" href="https://www.svgrepo.com/show/452192/tiktok.svg" />
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script src="https://cdn.jsdelivr.net/npm/particles.js@2.0.0/particles.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/qrcodejs/qrcode.min.js"></script>
+  <style>
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: linear-gradient(135deg, #0f172a, #1e293b);
+      color: white;
+      overflow-x: hidden;
+    }
+    #particles-js {
+      position: fixed;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+    }
+    .glass {
+      background: rgba(255, 255, 255, 0.05);
+      backdrop-filter: blur(12px);
+      -webkit-backdrop-filter: blur(12px);
+      border: 1px solid rgba(255, 255, 255, 0.15);
+    }
+    .glow-button {
+      background: linear-gradient(45deg, #ff0066, #ffcc00);
+      color: white;
+      padding: 0.75rem 1.5rem;
+      border: none;
+      border-radius: 9999px;
+      box-shadow: 0 0 10px #ff0066, 0 0 20px #ffcc00;
+      transition: all 0.3s ease;
+    }
+    .glow-button:hover {
+      box-shadow: 0 0 20px #ff0066, 0 0 40px #ffcc00;
+      transform: scale(1.05);
+    }
+    .toast {
+      position: fixed;
+      bottom: 1rem;
+      right: 1rem;
+      background: rgba(0,0,0,0.7);
+      padding: 10px 20px;
+      border-radius: 8px;
+      color: white;
+      display: none;
+    }
+  </style>
+</head>
+<body>
+  <div id="particles-js"></div>
+  <div class="flex items-center justify-center min-h-screen px-4">
+    <div class="glass rounded-2xl p-8 max-w-xl w-full space-y-6 text-white">
+      <div class="text-center">
+        <img src="https://www.svgrepo.com/show/452192/tiktok.svg" class="w-16 h-16 mx-auto">
+        <h1 class="text-3xl font-bold mt-4">TikTok Downloader Super</h1>
+        <p class="text-sm text-gray-300 mt-2">Download video TikTok tanpa watermark + fitur lengkap</p>
+      </div>
+      <div class="space-y-4">
+        <input type="text" id="tiktokUrl" placeholder="Tempel link TikTok atau drag di sini" class="w-full p-3 rounded-xl bg-white/20 text-white placeholder-white/70" />
+        <select id="quality" class="w-full p-3 rounded-xl bg-white/20 text-white">
+          <option value="hd">HD</option>
+          <option value="720p">720p</option>
+          <option value="480p">480p</option>
+        </select>
+        <div class="flex flex-col sm:flex-row gap-2 justify-center">
+          <button class="glow-button w-full sm:w-auto" onclick="downloadVideo()">Download Video</button>
+          <button class="glow-button w-full sm:w-auto" onclick="downloadMP3()">Download Audio</button>
+        </div>
+        <div id="preview" class="hidden mt-4 text-center">
+          <img id="thumbnail" class="mx-auto rounded-lg" width="200" />
+          <p id="videoTitle" class="text-sm mt-2">Judul Video</p>
+          <div id="qrcode" class="mt-4"></div>
+        </div>
+        <div class="flex gap-3 justify-center text-xs text-gray-300">
+          <button onclick="share('wa')">Share WhatsApp</button>
+          <button onclick="share('tg')">Telegram</button>
+          <button onclick="share('x')">X</button>
+        </div>
+      </div>
+      <div class="mt-4">
+        <h3 class="text-sm font-bold mb-2">Riwayat Unduhan:</h3>
+        <ul id="historyList" class="text-xs text-gray-400 list-disc list-inside"></ul>
+      </div>
+    </div>
+  </div>
+
+  <div id="toast" class="toast"></div>
+
+  <script>
+    particlesJS("particles-js", {
+      particles: { number: { value: 80 }, size: { value: 3 }, move: { speed: 2 }, color: { value: "#ffffff" }, line_linked: { enable: true, distance: 150, color: "#ffffff", opacity: 0.4, width: 1 } }
+    });
+
+    function showToast(msg) {
+      const toast = document.getElementById("toast");
+      toast.innerText = msg;
+      toast.style.display = "block";
+      setTimeout(() => toast.style.display = "none", 3000);
+    }
+
+    function updateHistory(url) {
+      const history = JSON.parse(localStorage.getItem("downloadHistory") || "[]");
+      history.unshift(url);
+      localStorage.setItem("downloadHistory", JSON.stringify(history));
+      const list = document.getElementById("historyList");
+      list.innerHTML = "";
+      history.slice(0, 5).forEach(item => {
+        const li = document.createElement("li");
+        li.textContent = item;
+        list.appendChild(li);
+      });
+    }
+
+    function downloadVideo() {
+      const url = document.getElementById('tiktokUrl').value;
+      if (!url.includes("tiktok.com")) return alert("Link tidak valid.");
+      updateHistory(url);
+      showToast("Link disalin & membuka SnapTik...");
+      navigator.clipboard.writeText(url);
+      window.open(`https://snaptik.app/ID?url=${encodeURIComponent(url)}`, "_blank");
+      document.getElementById("preview").classList.remove("hidden");
+      document.getElementById("thumbnail").src = "https://i.ytimg.com/vi/dQw4w9WgXcQ/hqdefault.jpg";
+      document.getElementById("videoTitle").textContent = "Judul Video (simulasi)";
+      document.getElementById("qrcode").innerHTML = "";
+      new QRCode(document.getElementById("qrcode"), url);
+    }
+
+    function downloadMP3() {
+      const url = document.getElementById('tiktokUrl').value;
+      if (!url.includes("tiktok.com")) return alert("Link tidak valid.");
+      showToast("Mengalihkan ke SSSTik untuk unduh MP3...");
+      window.open(`https://ssstik.io/id?url=${encodeURIComponent(url)}`, "_blank");
+    }
+
+    function share(platform) {
+      const url = encodeURIComponent(document.getElementById('tiktokUrl').value);
+      if (!url) return showToast("Isi link dulu!");
+      let shareUrl = "#";
+      if (platform === "wa") shareUrl = `https://wa.me/?text=${url}`;
+      else if (platform === "tg") shareUrl = `https://t.me/share/url?url=${url}`;
+      else if (platform === "x") shareUrl = `https://x.com/intent/tweet?text=${url}`;
+      window.open(shareUrl, "_blank");
+    }
+
+    document.body.addEventListener('paste', e => {
+      const paste = e.clipboardData.getData('text');
+      if (paste.includes("tiktok.com")) {
+        document.getElementById("tiktokUrl").value = paste;
+        showToast("Link TikTok terdeteksi dari clipboard!");
+      }
+    });
+
+    updateHistory();
+  </script>
+</body>
+</html>
